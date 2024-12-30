@@ -6,6 +6,7 @@ set(COMPONENT_SRCS
 
 set(COMPONENT_REQUIRES 
     ecnu_log
+    esp_wifi
     )
 
 register_component()

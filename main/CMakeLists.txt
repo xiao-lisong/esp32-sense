@@ -3,6 +3,7 @@ set(requires
     ecnu_log
     ecnu_wifi
     ecnu_transmit
+    ecnu_data
     )
 
 set(APP_SRCS

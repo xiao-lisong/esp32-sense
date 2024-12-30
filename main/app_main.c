@@ -11,6 +11,7 @@
 #include "ecnu_wifi.h"
 #include "nvs_flash.h"
 #include "ecnu_transmit.h"
+#include "ecnu_data.h"
 
 #define WIFI_SSID "xiaolisong_F3A057_DH"
 #define WIFI_PASSWORD "12345678"
@@ -44,6 +45,8 @@ int app_main()
     ecnu_wifi_wait_connected();
 
     ecnu_transmit_init();
+
+    ecnu_data_init();
 
     int num = 0;
     char send_data[16] = {0};
