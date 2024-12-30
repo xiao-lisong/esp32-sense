@@ -2,6 +2,7 @@ set(requires
     nvs_flash
     ecnu_log
     ecnu_wifi
+    ecnu_transmit
     )
 
 set(APP_SRCS

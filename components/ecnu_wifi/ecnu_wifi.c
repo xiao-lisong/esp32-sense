@@ -26,6 +26,15 @@ typedef struct {
 
 static ecnu_wifi_obj_t g_wifi_obj;
 
+int ecnu_wifi_wait_connected()
+{
+
+    while (g_wifi_obj.status != 2) {
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+    return 0;
+}
+
 int ecnu_wifi_connect()
 {
     ecnu_wifi_event_t event = {
@@ -82,6 +91,7 @@ static int ecnu_wifi_task_stnp()
     settimeofday(&tv, NULL);
 
     LOGI("Current time: %s %d\n", asctime(&timeinfo), timeinfo.tm_year );
+    g_wifi_obj.status = 2;
     return 0;
 }
 
