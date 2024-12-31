@@ -51,9 +51,9 @@ int app_main()
     int num = 0;
     char send_data[16] = {0};
     while (1) {
-        memset(send_data, 0, sizeof(send_data));
-        sprintf(send_data, "test %d", num++);
-        ecnu_transmit_send(send_data, strlen(send_data) + 1);
+        // memset(send_data, 0, sizeof(send_data));
+        // sprintf(send_data, "test %d", num++);
+        // ecnu_transmit_send(send_data, strlen(send_data) + 1);
         system_info_dump();
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }

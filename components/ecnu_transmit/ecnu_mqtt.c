@@ -15,8 +15,8 @@ typedef struct {
 static ecnu_mqtt_obj_t g_ecnu_mqtt;
 int ecnu_mqtt_send(char * msg, int len)
 {
-    LOGI("MQTT send msg: %s\n", msg);
-    esp_mqtt_client_publish(g_ecnu_mqtt.client, MQTT_TOPIC, msg, len, 2, 0);
+    // LOGI("MQTT send msg: %s\n", msg);
+    esp_mqtt_client_publish(g_ecnu_mqtt.client, MQTT_TOPIC, msg, len, 0, 0);
     return 0;
 }
 
@@ -58,6 +58,8 @@ int ecnu_mqtt_init()
     // MQTT 客户端配置
     esp_mqtt_client_config_t mqtt_cfg = {
         .broker.address.uri = MQTT_BROKER,
+        .buffer.out_size = 512*1024,
+        .buffer.size = 512*1024,
     };
     // 创建并启动 MQTT 客户端
     g_ecnu_mqtt.client = esp_mqtt_client_init(&mqtt_cfg);

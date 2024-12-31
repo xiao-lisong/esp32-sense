@@ -1,6 +1,10 @@
 #include "ecnu_log.h"
 #include "ecnu_camera.h"
 #include "esp_camera.h"
+#include "ecnu_packege.h"
+#include "ecnu_utils.h"
+#include "ecnu_transmit.h"
+
 #ifndef CAMERA_CONFIG_H
 #define CAMERA_CONFIG_H
 
@@ -26,6 +30,7 @@
 
 #endif //CAMERA_CONFIG_H
 
+#define ECNU_CAMERA_BUFFER_SIZE (256 * 1024)
 
 
 typedef struct {
@@ -38,11 +43,22 @@ static ecnu_camera_obj_t g_ecnu_camera_obj;
 
 static void ecnu_camera_task(void *arg)
 {
+    int ret = 0;
     camera_fb_t *fb = NULL;
     float fps = 0;
     int64_t start_time = esp_timer_get_time();
     int64_t end_time = 0;
     int frame_count = 0;
+    ecnu_packege_extra_image extra_image = {0};
+    char * buffer = NULL;
+    buffer = malloc(ECNU_CAMERA_BUFFER_SIZE);
+    if (buffer == NULL) {
+        LOGE("malloc failed");
+        vTaskDelete(NULL);
+        return;
+    }
+
+
     while (1) {
         fb = esp_camera_fb_get();
         if (!fb) {
@@ -53,7 +69,7 @@ static void ecnu_camera_task(void *arg)
         // 计算帧率
         if (frame_count == 20) {
             int64_t end_time = esp_timer_get_time();
-            fps = ((20 * 1000000) / (end_time - start_time));
+            fps = ((20 * 1000000.0) / (float)(end_time - start_time));
             start_time = end_time;
             frame_count = 0;
         }
@@ -61,12 +77,31 @@ static void ecnu_camera_task(void *arg)
         LOGI("Camera frame fps %f, size: %d x %d, format %d, time_stamp %lld %ld, data_size %d\n",
             fps, fb->width, fb->height, fb->format, fb->timestamp.tv_sec, fb->timestamp.tv_usec, fb->len);
 
+        // 编码json
+        extra_image.width = fb->width;
+        extra_image.height = fb->height;
+        strcpy(extra_image.format, "jpeg");
+        extra_image.timestamp = ecnu_get_current_timestamp_ms();
+        long long start_tm = ecnu_get_current_timestamp_ms();
+        ret = ecnu_packege_encode(ECNU_PACKEGE_ENCODE_IMAGE, (const char *)fb->buf, fb->len, buffer, ECNU_CAMERA_BUFFER_SIZE, &extra_image);
+        if (ret < 0) {
+            LOGE("ecnu_packege_encode failed");
+        } else {
+            LOGI("encode cost time %lld ms\n", ecnu_get_current_timestamp_ms() - start_tm);
+            start_tm = ecnu_get_current_timestamp_ms();
+            LOGI("ecnu_packege_encode success, size %d\n", ret);
+            ecnu_transmit_send(buffer, ret);
+            LOGI("send cost time %lld ms\n", ecnu_get_current_timestamp_ms() - start_tm);
+        }
+
         esp_camera_fb_return(fb);
         fb = NULL;
     }
+
+    free(buffer);
+    vTaskDelete(NULL);
+    return;
 }
-
-
 
 
 int ecnu_camera_init()
@@ -94,7 +129,8 @@ int ecnu_camera_init()
         .xclk_freq_hz = 20000000,          // 图像传感器的时钟频率
         .fb_location = CAMERA_FB_IN_PSRAM, // 设置帧缓冲区存储位置
         .pixel_format = PIXFORMAT_JPEG,    // 图像的像素格式：PIXFORMAT_ + YUV422|GRAYSCALE|RGB565|JPEG
-        .frame_size = FRAMESIZE_UXGA,      // 图像的分辨率大小：FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
+        .frame_size = FRAMESIZE_HD,
+        //.frame_size = FRAMESIZE_UXGA,      // 图像的分辨率大小：FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
         .jpeg_quality = 15,                // JPEG图像的质量，范围从0到63。
         .fb_count = 2,                     // 使用的帧缓冲区数量。
         .grab_mode = CAMERA_GRAB_LATEST    // 图像捕获模式。

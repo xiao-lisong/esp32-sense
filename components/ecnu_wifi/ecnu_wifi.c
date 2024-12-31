@@ -138,7 +138,7 @@ int ecnu_wifi_set_config(const char *ssid, const char *password)
 static void ecnu_wifi_event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
 {
-    LOGI("event_base: %s, event_id: %ld", event_base, event_id);
+    LOGI("event_base: %s, event_id: %ld\n", event_base, event_id);
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         LOGI("Start WiFi connection\n");
         esp_wifi_connect();
