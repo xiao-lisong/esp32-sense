@@ -4,6 +4,7 @@ set(requires
     ecnu_wifi
     ecnu_transmit
     ecnu_data
+    ecnu_config
     )
 
 set(APP_SRCS

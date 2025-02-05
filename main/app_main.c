@@ -12,7 +12,7 @@
 #include "nvs_flash.h"
 #include "ecnu_transmit.h"
 #include "ecnu_data.h"
-
+#include "ecnu_config.h"
 #define WIFI_SSID "xiaolisong_F3A057_DH"
 #define WIFI_PASSWORD "12345678"
 
@@ -38,8 +38,19 @@ int app_main()
 
     nvs_flash_init();
 
+    ecnu_config_init();
+
     ecnu_wifi_init();
-    ecnu_wifi_set_config(WIFI_SSID, WIFI_PASSWORD);
+    char * ssid = NULL;
+    char * password = NULL;
+    ecnu_config_get_str("wifi", "ssid", &ssid);
+    ecnu_config_get_str("wifi", "password", &password);
+    if (ssid == NULL || password == NULL) {
+        LOGI("ssid or password is NULL\n");
+        ssid = WIFI_SSID;
+        password = WIFI_PASSWORD;
+    }
+    ecnu_wifi_set_config(ssid, password);
     ecnu_wifi_connect();
 
     ecnu_wifi_wait_connected();
