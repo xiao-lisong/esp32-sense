@@ -1,0 +1,23 @@
+{
+    "wifi": {
+      "ssid": "Your_WiFi_SSID",
+      "password": "Your_WiFi_Password"
+    },
+    "mqtt": {
+      "broker": "mqtt.example.com",
+      "port": 1883,
+      "username": "mqtt_username",
+      "password": "mqtt_password",
+      "client_id": "device_001",
+      "topic": "home/device/001"
+    },
+    "image_capture": {
+      "width": 1920,
+      "height": 1080,
+      "format": "jpg",
+      "quality": 85
+    },
+    "device": {
+      "name": "Camera_Device_001"
+    }
+}
