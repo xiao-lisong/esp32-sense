@@ -4,12 +4,12 @@
       "password": "Your_WiFi_Password"
     },
     "mqtt": {
-      "broker": "mqtt.example.com",
+      "broker": "mqtt://www.xiaolisong.asia:1883",
       "port": 1883,
       "username": "mqtt_username",
       "password": "mqtt_password",
       "client_id": "device_001",
-      "topic": "home/device/001"
+      "topic": "test/topic"
     },
     "image_capture": {
       "width": 1920,

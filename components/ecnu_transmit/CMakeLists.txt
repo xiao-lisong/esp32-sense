@@ -7,6 +7,7 @@ set(COMPONENT_SRCS
 
 set(COMPONENT_REQUIRES 
     ecnu_log
+    ecnu_config
     mqtt
     )
 

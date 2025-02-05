@@ -4,19 +4,21 @@
 #include "freertos/task.h"
 #include "ecnu_log.h"
 #include "mqtt_client.h"
-
+#include "ecnu_config.h"
 #define MQTT_BROKER    "mqtt://www.xiaolisong.asia:1883"
 #define MQTT_TOPIC     "test/topic"
 
 typedef struct {
     esp_mqtt_client_handle_t client;
+    char * broker;
+    char * topic;
 } ecnu_mqtt_obj_t;
 
 static ecnu_mqtt_obj_t g_ecnu_mqtt;
 int ecnu_mqtt_send(char * msg, int len)
 {
     // LOGI("MQTT send msg: %s\n", msg);
-    esp_mqtt_client_publish(g_ecnu_mqtt.client, MQTT_TOPIC, msg, len, 0, 0);
+    esp_mqtt_client_publish(g_ecnu_mqtt.client, g_ecnu_mqtt.topic, msg, len, 0, 0);
     return 0;
 }
 
@@ -55,9 +57,16 @@ int ecnu_mqtt_init()
 {
     LOGI("MQTT init\n");
     memset(&g_ecnu_mqtt, 0, sizeof(g_ecnu_mqtt));
+    ecnu_config_get_str("mqtt", "broker", &g_ecnu_mqtt.broker);
+    ecnu_config_get_str("mqtt", "topic", &g_ecnu_mqtt.topic);
+    if (g_ecnu_mqtt.broker == NULL || g_ecnu_mqtt.topic == NULL) {
+        LOGE("MQTT broker not found\n");
+        g_ecnu_mqtt.broker = MQTT_BROKER;
+        g_ecnu_mqtt.topic = MQTT_TOPIC;
+    }
     // MQTT 客户端配置
     esp_mqtt_client_config_t mqtt_cfg = {
-        .broker.address.uri = MQTT_BROKER,
+        .broker.address.uri = g_ecnu_mqtt.broker,
         .buffer.out_size = 512*1024,
         .buffer.size = 512*1024,
     };
