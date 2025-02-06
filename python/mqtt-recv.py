@@ -29,13 +29,14 @@ def on_message(client, userdata, msg):
         timestamp = data.get("timestamp", 0)
         data_type = data.get("data_type", "")
         image_info = data.get("payload", {}).get("image", {})
-
+        timestamp_s = timestamp / 1000
+        print(f"Device ID: {device_id}, Timestamp: {timestamp}, Data Type: {data_type}")
         if data_type == "image" and "data" in image_info:
             # 解码 Base64 图像数据
             image_data = base64.b64decode(image_info["data"])
 
             # 保存图像到文件
-            timestamp_str = datetime.fromtimestamp(timestamp).strftime("%Y%m%d_%H%M%S%t")
+            timestamp_str = datetime.fromtimestamp(timestamp_s).strftime("%Y%m%d_%H%M%S") + f".{timestamp % 1000:03d}"
             filename = f"images/{device_id}_{timestamp_str}.jpeg"
             with open(filename, "wb") as image_file:
                 image_file.write(image_data)
