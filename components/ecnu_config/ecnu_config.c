@@ -13,7 +13,7 @@ typedef struct {
 
 static ecmu_config_t g_ecnu_config_obj;
 
-int ecnu_config_get_int(const char *type, const char *key, void **value)
+int ecnu_config_get_int(const char *type, const char *key, void *value)
 {
     if (g_ecnu_config_obj.config_root == NULL) {
         LOGE("Config is not initialized\n");
